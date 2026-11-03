@@ -1,0 +1,7 @@
+preparação 
+
+terminal:
+.\gradlew.bat bootRun
+
+web:
+http://localhost:8080/api/swagger-ui.html
