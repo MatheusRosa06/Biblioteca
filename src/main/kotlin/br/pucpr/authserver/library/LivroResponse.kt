@@ -5,13 +5,17 @@ data class LivroResponse(
     var titulo: String,
     var ano: Int,
     var preco: Double,
-    var autorNome: String
+    var autorNome: String,
+    var editoraNome: String, 
+    var generos: List<String>
 ) {
     constructor(livro: Livro) : this(
         id = livro.id!!,
         titulo = livro.titulo,
         ano = livro.ano,
         preco = livro.preco,
-        autorNome = livro.autor.nome
+        autorNome = livro.autor.nome,
+        editoraNome = livro.editora?.nome ?: "Sem Editora", 
+        generos = livro.generos.map { it.nome }
     )
 }

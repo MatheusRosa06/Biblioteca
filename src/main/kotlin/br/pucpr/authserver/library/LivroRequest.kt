@@ -1,21 +1,23 @@
 package br.pucpr.authserver.library
 
-import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Positive
 
 data class LivroRequest(
-    @NotBlank(message = "O título não pode estar em branco")
+    @field:NotBlank(message = "O título não pode estar em branco")
     var titulo: String?,
 
-    @NotNull(message = "O ano é obrigatório")
+    @field:NotNull(message = "O ano é obrigatório")
     var ano: Int?,
 
-    @NotNull(message = "O preço é obrigatório")
-    @Min(value = 0, message = "O preço deve ser maior ou igual a zero")
+    @field:NotNull(message = "O preço é obrigatório")
+    @field:Positive(message = "O preço deve ser maior que zero")
     var preco: Double?,
 
-    @NotNull(message = "O ID do autor é obrigatório")
-    @Min(value = 1)
-    var autorId: Long?
+    @field:NotNull(message = "O ID do autor é obrigatório")
+    var autorId: Long?,
+
+    @field:NotNull(message = "O ID da editora é obrigatório")
+    var editoraId: Long? 
 )

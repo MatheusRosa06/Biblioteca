@@ -10,31 +10,36 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class LivroService(
     private val livroRepository: LivroRepository,
-    private val autorRepository: AutorRepository
+    private val autorRepository: AutorRepository,
+    private val generoRepository: GeneroRepository,
+    private val editoraRepository: EditoraRepository 
 ) {
     private val logger = LoggerFactory.getLogger(LivroService::class.java)
 
     fun insert(request: LivroRequest): Livro {
         logger.info("A criar novo livro: ${request.titulo}")
         
-       
-        val autorId = request.autorId 
-            ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID do autor é obrigatório!")
-
+  
+        val autorId = request.autorId ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID do autor é obrigatório!")
         val autor = autorRepository.findByIdOrNull(autorId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Autor $autorId não encontrado!")
+
+     
+        val editoraId = request.editoraId ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "O ID da editora é obrigatório!")
+        val editora = editoraRepository.findByIdOrNull(editoraId)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Editora $editoraId não encontrada!")
 
         val livro = Livro(
             id = null,
             titulo = request.titulo!!,
             ano = request.ano!!,
             preco = request.preco!!,
-            autor = autor
+            autor = autor,
+            editora = editora 
         )
         return livroRepository.save(livro)
     }
 
-    // filtro
     fun findAllFiltered(titulo: String?, sortBy: String): List<Livro> {
         logger.info("A listar livros com filtro de título: $titulo e ordenados por: $sortBy")
         val sort = Sort.by(sortBy)
@@ -56,5 +61,20 @@ class LivroService(
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "Livro $id não encontrado!")
         }
         livroRepository.deleteById(id)
+    }
+
+    fun addGenero(livroId: Long, generoId: Long): Boolean {
+        logger.info("A associar gênero $generoId ao livro $livroId")
+        val livro = findByIdOrNull(livroId) 
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Livro $livroId não encontrado!")
+        
+        val genero = generoRepository.findByIdOrNull(generoId) 
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Gênero $generoId não encontrado!")
+
+        if (livro.generos.any { it.id == generoId }) return false
+
+        livro.generos.add(genero)
+        livroRepository.save(livro)
+        return true
     }
 }

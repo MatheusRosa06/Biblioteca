@@ -2,7 +2,7 @@ package br.pucpr.authserver.library
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
-import org.springframework.http.HttpStatus
+import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*
 class LivroController(
     private val livroService: LivroService
 ) {
+    private val logger = LoggerFactory.getLogger(LivroController::class.java)
+
     @GetMapping
     fun list(
         @RequestParam(required = false) titulo: String?,
@@ -22,28 +24,31 @@ class LivroController(
         return ResponseEntity.ok(livros)
     }
 
-    @PostMapping
-    fun insert(
-        @Valid @RequestBody request: LivroRequest
-    ): ResponseEntity<LivroResponse> {
-        val livro = livroService.insert(request)
-        return ResponseEntity.status(HttpStatus.CREATED).body(LivroResponse(livro))
-    }
-
     @GetMapping("/{id}")
-    fun getById(
-        @Min(1) @PathVariable id: Long
-    ): ResponseEntity<LivroResponse> {
+    fun getById(@Min(1) @PathVariable id: Long): ResponseEntity<LivroResponse> {
         val livro = livroService.findByIdOrNull(id)
             ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(LivroResponse(livro))
     }
+  
+    @PostMapping
+    fun insert(@Valid @RequestBody request: LivroRequest): ResponseEntity<LivroResponse> {
+        val livro = livroService.insert(request)
+        return ResponseEntity.status(201).body(LivroResponse(livro))
+    }
 
     @DeleteMapping("/{id}")
-    fun delete(
-        @Min(1) @PathVariable id: Long
-    ): ResponseEntity<Void> {
+    fun delete(@Min(1) @PathVariable id: Long): ResponseEntity<Void> {
         livroService.deleteById(id)
-        return ResponseEntity.ok().build()
+        return ResponseEntity.noContent().build()
+    }
+
+    @PutMapping("/{livroId}/generos/{generoId}")
+    fun addGenero(
+        @Min(1) @PathVariable livroId: Long,
+        @Min(1) @PathVariable generoId: Long
+    ): ResponseEntity<Void> {
+        val associado = livroService.addGenero(livroId, generoId)
+        return if (associado) ResponseEntity.ok().build() else ResponseEntity.badRequest().build()
     }
 }
