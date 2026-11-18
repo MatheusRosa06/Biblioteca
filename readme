@@ -1,7 +1,30 @@
-preparação 
+Alunos: Matheus Gomes, Rafael Naslowski,Gabriel Donato
 
-terminal:
+## Preparacao
+
+No terminal, execute:
+
 .\gradlew.bat bootRun
 
-web:
+Acesse o Swagger:
 http://localhost:8080/api/swagger-ui.html
+
+
+## Fazer login e obter o token
+
+No Swagger, abra o endpoint `POST /api/auth/login` e execute com o usuario administrador:
+
+```json
+{
+  "email": "admin@authserver.com",
+  "password": "admin"
+}
+```
+Copie somente o conteudo do campo `token`, sem as aspas.
+
+## Utilizar o token no Swagger
+
+Clique no botao Authorize, no canto superior direito do Swagger.
+No campo BearerAuth, cole somente o token copiado.
+Clique em Authorize.
+Clique em Close.

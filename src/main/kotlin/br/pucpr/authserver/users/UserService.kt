@@ -6,16 +6,20 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.security.crypto.password.PasswordEncoder
 
 @Service
 class UserService(
     val repository: UserRepository,
-    val roleRepository: RoleRepository
+    val roleRepository: RoleRepository,
+    val passwordEncoder: PasswordEncoder
 ) {
     fun insert(user: User): User {
         if (repository.findByEmail(user.email) != null) {
             throw ResponseStatusException(HttpStatus.CONFLICT, "User already exists")
         }
+        val password = user.password
+        user.password = passwordEncoder.encode(password)!!
         return repository.save(user)
     }
 

@@ -26,6 +26,10 @@ spring:
 server:
   servlet:
     context-path: /api
+security:
+  jwt:
+    secret: "troque-esta-chave-secreta-em-producao-por-uma-chave-com-pelo-menos-32-caracteres"
+    expiration-minutes: 60
 springdoc:
   swagger-ui:
     use-root-path: true

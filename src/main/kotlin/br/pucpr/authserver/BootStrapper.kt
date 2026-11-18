@@ -5,6 +5,7 @@ import br.pucpr.authserver.roles.RoleRepository
 import br.pucpr.authserver.users.User
 import br.pucpr.authserver.users.UserRepository
 import jakarta.transaction.Transactional
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.stereotype.Component
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Component
 @Component
 class BootStrapper(
     val roleRepository: RoleRepository,
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+    val passwordEncoder: PasswordEncoder
 ) : ApplicationListener<ContextRefreshedEvent> {
 
     @Transactional
@@ -28,7 +30,7 @@ class BootStrapper(
         if (userRepository.findByRole("ADMIN").isEmpty()) {
             val admin = User(
                 name = "Administrator",
-                password = "admin",
+                password = passwordEncoder.encode("admin")!!,
                 email = "admin@authserver.com"
             )
             admin.roles.add(adminRole)

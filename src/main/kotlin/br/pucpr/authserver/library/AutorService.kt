@@ -5,8 +5,10 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class AutorService(
     private val autorRepository: AutorRepository
 ) {
@@ -38,9 +40,14 @@ class AutorService(
 
     fun deleteById(id: Long) {
         logger.warn("A apagar o autor com ID: $id")
-        if (!autorRepository.existsById(id)) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Autor $id não encontrado!")
-        }
-        autorRepository.deleteById(id)
+        val autor = autorRepository.findByIdOrNull(id)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Autor $id não encontrado!")
+
+        autor.livros.forEach { livro -> livro.generos.clear() }
+        autor.livros.clear()
+        autorRepository.flush()
+
+        autorRepository.delete(autor)
+        autorRepository.flush()
     }
 }

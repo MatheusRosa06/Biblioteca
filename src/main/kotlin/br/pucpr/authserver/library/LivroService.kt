@@ -52,15 +52,18 @@ class LivroService(
     }
 
     fun findByIdOrNull(id: Long): Livro? {
-        return livroRepository.findByIdOrNull(id)
+        return livroRepository.findByIdWithAssociations(id)
     }
 
     fun deleteById(id: Long) {
         logger.warn("A apagar o livro com ID: $id")
-        if (!livroRepository.existsById(id)) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Livro $id não encontrado!")
-        }
-        livroRepository.deleteById(id)
+        val livro = findByIdOrNull(id)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Livro $id não encontrado!")
+
+        livro.generos.clear()
+        livroRepository.flush()
+        livroRepository.delete(livro)
+        livroRepository.flush()
     }
 
     fun addGenero(livroId: Long, generoId: Long): Boolean {

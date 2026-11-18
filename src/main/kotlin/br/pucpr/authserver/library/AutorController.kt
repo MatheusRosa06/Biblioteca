@@ -4,6 +4,8 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
@@ -46,6 +48,8 @@ class AutorController(
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "bearerAuth")
     fun delete(
         @Min(1) @PathVariable id: Long
     ): ResponseEntity<Void> {
